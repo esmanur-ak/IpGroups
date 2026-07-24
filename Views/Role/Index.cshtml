@@ -1,0 +1,442 @@
+@model IEnumerable<IpGroups.Models.ViewModels.RoleViewModel>
+
+@{
+    ViewData["Title"] = "Kullanıcı ve İzin Yönetimi";
+    var users = ViewBag.Users as List<IpGroups.Models.ViewModels.UserRoleViewModel> ?? new List<IpGroups.Models.ViewModels.UserRoleViewModel>();
+    var allModuleGroups = ViewBag.AllModuleGroups as List<IpGroups.Models.ViewModels.ModulePermissionGroup> ?? new List<IpGroups.Models.ViewModels.ModulePermissionGroup>();
+}
+
+<div class="row">
+
+
+    <!-- Kullanıcılar & Kişiye Özel İzin Atamaları -->
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h4 class="card-title mb-0"><i class="fas fa-users-cog text-primary mr-2"></i> Kullanıcılar ve İzin Atamaları</h4>
+                    <div class="d-flex align-items-center gap-3" id="dtHeaderRight" style="gap: 15px;">
+                        <button type="button" class="btn btn-success btn-sm" id="btnYeniKullanici">
+                            <i class="fa fa-user-plus mr-1"></i> Yeni Kullanıcı Ekle
+                        </button>
+                    </div>
+                </div>
+                <p class="text-muted small mb-3">Eklenen her yeni kullanıcı varsayılan olarak "User" rolü alır. Her kullanıcıya özel izinleri tek tek seçebilirsiniz.</p>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover data-table">
+                        <thead>
+                            <tr>
+                                <th>Ad Soyad</th>
+                                <th>E-Posta</th>
+
+                                <th>Özel İzin Durumu</th>
+                                <th style="width:160px;">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in users)
+                            {
+                                <tr>
+                                    <td class="font-weight-medium">
+                                        @user.AdSoyad
+                                        @if (user.IsMainAdmin)
+                                        {
+                                            <i class="fas fa-crown text-warning ml-1" title="Ana Sistem Yöneticisi"></i>
+                                        }
+                                    </td>
+                                    <td>@user.Email</td>
+
+                                    <td>
+                                        @if (user.IsMainAdmin)
+                                        {
+                                            <span class="badge badge-success p-1"><i class="fa fa-check mr-1"></i> Tam Yetkili</span>
+                                        }
+                                        else if (user.DirectPermissionCount > 0)
+                                        {
+                                            <span class="badge badge-success p-1">@user.DirectPermissionCount İzin Tanımlı</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">Varsayılan Rol İzinleri</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <button type="button" class="btn btn-outline-info btn-xs btn-edit-user-permissions" data-userid="@user.UserId" data-name="@user.AdSoyad" title="Kullanıcı İzinlerini Düzenle">
+                                                <i class="fa fa-key"></i> İzinler
+                                            </button>
+
+                                            @if (user.IsMainAdmin)
+                                            {
+                                                <button type="button" class="btn btn-outline-secondary btn-xs" disabled title="Ana Sistem Yöneticisi Silinemez">
+                                                    <i class="fa fa-lock"></i>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="button" class="btn btn-outline-danger btn-xs btn-delete-user" data-userid="@user.UserId" data-name="@user.AdSoyad" title="Kullanıcıyı Sil">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== YENİ KULLANICI EKLE MODAL ======================== -->
+<div class="modal fade" id="createUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="fa fa-user-plus mr-2"></i> Yeni Kullanıcı Oluştur (User) & İzin Seçimi</h5>
+                <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <form id="createUserForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div id="userCreateErrors" class="alert alert-danger d-none"></div>
+
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Ad Soyad <span class="text-danger">*</span></label>
+                            <input type="text" id="newAdSoyad" name="AdSoyad" class="form-control" placeholder="Ahmet Yılmaz" required />
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>E-Posta Adresi <span class="text-danger">*</span></label>
+                            <input type="text" id="newUserEmail" name="Email" class="form-control" placeholder="ornek@ipgroups.com" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 form-group">
+                            <label>Cinsiyet <span class="text-danger">*</span></label>
+                            <div class="d-flex align-items-center mt-2">
+                                <div class="custom-control custom-radio mr-3">
+                                    <input type="radio" id="genderMale" name="Gender" class="custom-control-input" value="Erkek" required>
+                                    <label class="custom-control-label" for="genderMale">Erkek</label>
+                                </div>
+                                <div class="custom-control custom-radio">
+                                    <input type="radio" id="genderFemale" name="Gender" class="custom-control-input" value="Kadın" required>
+                                    <label class="custom-control-label" for="genderFemale">Kadın</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Şifre <span class="text-danger">* (en az 6 karakter)</span></label>
+                        <input type="password" id="newPassword" name="Password" class="form-control" placeholder="••••••••" required />
+                    </div>
+
+                    <hr />
+                    <h6 class="font-weight-bold text-dark mb-2"><i class="fas fa-key text-success mr-2"></i> Kullanıcıya Verilecek Özel İzinler:</h6>
+                    <p class="text-muted small mb-3">Bu kullanıcıya vermek istediğiniz modül ve işlem izinlerini işaretleyin.</p>
+
+                    <div class="row">
+                        @foreach (var group in allModuleGroups)
+                        {
+                            <div class="col-md-6 mb-3">
+                                <div class="card border shadow-none">
+                                    <div class="card-header bg-light py-2 font-weight-bold text-dark">
+                                        <i class="fas fa-folder mr-2 text-success"></i> @group.ModuleName
+                                    </div>
+                                    <div class="card-body py-2 px-3">
+                                        @foreach (var perm in group.Permissions)
+                                        {
+                                            var isViewPerm = perm.PermissionName.Equals("Görüntüleme", System.StringComparison.OrdinalIgnoreCase);
+                                            <div class="custom-control custom-checkbox my-2">
+                                                <input type="checkbox" class="custom-control-input new-user-perm-chk" id="newUserPerm_@perm.PermissionValue" value="@perm.PermissionValue" @(isViewPerm ? "checked" : "")>
+                                                <label class="custom-control-label" for="newUserPerm_@perm.PermissionValue">@perm.PermissionName</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success" id="btnUserSave"><i class="fa fa-save mr-1"></i> Kullanıcıyı Oluştur</button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">İptal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== KULLANICI İZİNLERİ MODAL ======================== -->
+<div class="modal fade" id="userPermissionsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">
+                    <i class="fa fa-key mr-2"></i> Kullanıcı İzinlerini Düzenle — <span id="userPermTitle"></span>
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal"><span>&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="userPermLoading" class="text-center py-4">
+                    <div class="spinner-border text-info" role="status"></div>
+                </div>
+                <div id="userPermContent" class="d-none">
+                    <input type="hidden" id="userPermUserId" />
+                    <p class="text-muted small mb-3">Bu kullanıcının erişebileceği modül ve işlem izinlerini işaretleyin.</p>
+                    <div id="userPermMatrixContainer"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-info" id="btnSaveUserPermissions"><i class="fa fa-save mr-1"></i> İzinleri Kaydet</button>
+                <button type="button" class="btn btn-light" data-dismiss="modal">İptal</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var antiForgeryToken = $('input[name="__RequestVerificationToken"]').first().val();
+
+            // Datatable Ara Kutusunu Yeni Kullanıcı Ekle butonunun soluna taşı
+            setTimeout(function() {
+                var searchBox = $('.dataTables_filter');
+                if (searchBox.length) {
+                    searchBox.prependTo('#dtHeaderRight');
+                    searchBox.css({ 'text-align': 'left', 'margin-top': '0', 'margin-bottom': '0' });
+                    
+                    var label = searchBox.find('label');
+                    label.css({
+                        'display': 'flex',
+                        'align-items': 'center',
+                        'margin-bottom': '0',
+                        'font-weight': '600'
+                    });
+                    
+                    var input = searchBox.find('input');
+                    input.css({
+                        'margin-left': '8px',
+                        'display': 'inline-block',
+                        'width': 'auto'
+                    });
+                }
+            }, 100);
+
+            // ===================== YENİ KULLANICI EKLE =====================
+            $('#btnYeniKullanici').click(function () {
+                $('#createUserForm')[0].reset();
+                $('#userCreateErrors').addClass('d-none').empty();
+                $('.new-user-perm-chk').each(function () {
+                    var label = $(this).next('label').text().trim().toLowerCase();
+                    if (label === 'görüntüleme') {
+                        $(this).prop('checked', true);
+                    } else {
+                        $(this).prop('checked', false);
+                    }
+                });
+                $('#createUserModal').modal('show');
+            });
+
+            $('#createUserForm').submit(function (e) {
+                e.preventDefault();
+                var btn = $('#btnUserSave');
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Oluşturuluyor...');
+                $('#userCreateErrors').addClass('d-none').empty();
+
+                var selectedPerms = [];
+                $('.new-user-perm-chk:checked').each(function () {
+                    selectedPerms.push($(this).val());
+                });
+
+                var payload = {
+                    adSoyad: $('#newAdSoyad').val(),
+                    email: $('#newUserEmail').val(),
+                    gender: $('input[name="Gender"]:checked').val(),
+                    password: $('#newPassword').val(),
+                    selectedPermissions: selectedPerms
+                };
+
+                $.ajax({
+                    url: '/Role/CreateUser',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: { 'RequestVerificationToken': antiForgeryToken },
+                    data: JSON.stringify(payload),
+                    success: function (res) {
+                        if (res.success) {
+                            $('#createUserModal').modal('hide');
+                            Swal.fire({
+                                title: 'Başarılı!',
+                                text: 'Yeni kullanıcı başarıyla eklendi.',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(function () {
+                                location.reload();
+                            });
+                        } else {
+                            $('#userCreateErrors').removeClass('d-none').text(res.message || 'Kullanıcı oluşturulurken bir hata oluştu.');
+                        }
+                    },
+                    error: function () {
+                        $('#userCreateErrors').removeClass('d-none').text('Sunucu hatası oluştu.');
+                    },
+                    complete: function () {
+                        btn.prop('disabled', false).html('<i class="fa fa-save mr-1"></i> Kullanıcıyı Oluştur');
+                    }
+                });
+            });
+
+            // ===================== KULLANICI İZİNLERİ =====================
+            $('.btn-edit-user-permissions').click(function () {
+                var userId = $(this).data('userid');
+                var name = $(this).data('name');
+                $('#userPermUserId').val(userId);
+                $('#userPermTitle').text(name);
+                $('#userPermLoading').removeClass('d-none');
+                $('#userPermContent').addClass('d-none');
+                $('#userPermissionsModal').modal('show');
+
+                $.ajax({
+                    url: '/Role/GetUserPermissions?userId=' + userId,
+                    type: 'GET',
+                    success: function (res) {
+                        if (res.success) {
+                            var html = '<div class="row">';
+                            $.each(res.data.moduleGroups, function (gIdx, group) {
+                                html += '<div class="col-md-6 mb-4">' +
+                                    '<div class="card border shadow-none">' +
+                                    '<div class="card-header bg-light py-2 font-weight-bold text-dark"><i class="fas fa-folder mr-2 text-info"></i>' + group.moduleName + '</div>' +
+                                    '<div class="card-body py-2 px-3">';
+
+                                $.each(group.permissions, function (pIdx, perm) {
+                                    var chkId = 'userPerm_' + gIdx + '_' + pIdx;
+                                    var checked = perm.isSelected ? 'checked' : '';
+                                    html += '<div class="custom-control custom-checkbox my-2">' +
+                                        '<input type="checkbox" class="custom-control-input user-perm-chk" id="' + chkId + '" data-val="' + perm.permissionValue + '" data-group="' + group.moduleName + '" data-name="' + perm.permissionName + '" ' + checked + '>' +
+                                        '<label class="custom-control-label" for="' + chkId + '">' + perm.permissionName + '</label>' +
+                                        '</div>';
+                                });
+
+                                html += '</div></div></div>';
+                            });
+                            html += '</div>';
+
+                            $('#userPermMatrixContainer').html(html);
+                            $('#userPermLoading').addClass('d-none');
+                            $('#userPermContent').removeClass('d-none');
+                        } else {
+                            $('#userPermissionsModal').modal('hide');
+                            Swal.fire('Hata!', res.message || 'Kullanıcı izinleri yüklenemedi.', 'error');
+                        }
+                    }
+                });
+            });
+
+            $('#btnSaveUserPermissions').click(function () {
+                var userId = $('#userPermUserId').val();
+                var moduleGroupsDict = {};
+
+                $('.user-perm-chk').each(function () {
+                    var groupName = $(this).data('group');
+                    var permVal = $(this).data('val');
+                    var permName = $(this).data('name');
+                    var isSelected = $(this).is(':checked');
+
+                    if (!moduleGroupsDict[groupName]) {
+                        moduleGroupsDict[groupName] = { moduleName: groupName, permissions: [] };
+                    }
+
+                    moduleGroupsDict[groupName].permissions.push({
+                        permissionValue: permVal,
+                        permissionName: permName,
+                        isSelected: isSelected
+                    });
+                });
+
+                var moduleGroups = Object.values(moduleGroupsDict);
+                var btn = $(this);
+                btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Kaydediliyor...');
+
+                $.ajax({
+                    url: '/Role/UpdateUserPermissions',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    headers: { 'RequestVerificationToken': antiForgeryToken },
+                    data: JSON.stringify({ userId: userId, moduleGroups: moduleGroups }),
+                    success: function (res) {
+                        if (res.success) {
+                            $('#userPermissionsModal').modal('hide');
+                            Swal.fire({
+                                title: 'Başarılı!',
+                                text: 'Kullanıcı izinleri başarıyla güncellendi.',
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(function () {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire('Hata!', res.message || 'Kaydedilemedi.', 'error');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire('Hata!', 'Bir hata oluştu.', 'error');
+                    },
+                    complete: function () {
+                        btn.prop('disabled', false).html('<i class="fa fa-save mr-1"></i> İzinleri Kaydet');
+                    }
+                });
+            });
+
+            // ===================== KULLANICI SİLME =====================
+            $('.btn-delete-user').click(function () {
+                var userId = $(this).data('userid');
+                var name = $(this).data('name');
+
+                Swal.fire({
+                    title: 'Emin misiniz?',
+                    text: name + ' kullanıcısını silmek istediğinize emin misiniz?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Evet, Sil',
+                    cancelButtonText: 'İptal'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Role/DeleteUser/' + userId,
+                            type: 'POST',
+                            data: { id: userId, __RequestVerificationToken: antiForgeryToken },
+                            success: function (res) {
+                                if (res.success) {
+                                    Swal.fire({
+                                        title: 'Silindi!',
+                                        text: 'Kullanıcı başarıyla silindi.',
+                                        icon: 'success',
+                                        timer: 1500,
+                                        showConfirmButton: false
+                                    }).then(function () {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire('Hata!', res.message || 'Kullanıcı silinemedi.', 'error');
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+
+        });
+    </script>
+}

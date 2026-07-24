@@ -1,0 +1,506 @@
+@using IpGroups.Constants
+@model IEnumerable<IpGroups.Models.ViewModels.IpViewModel>
+
+@{
+    ViewData["Title"] = "IP Adresleri";
+}
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="card-title">Kayıtlı IP Adresleri</h4>
+                    @if (User.IsInRole("Ana Yönetici") || User.HasClaim("Permission", Permissions.Ip.Create))
+                    {
+                        <button type="button" class="btn btn-primary btn-icon-text" id="btnYeniIp">
+                            <i class="fa fa-plus btn-icon-prepend"></i> Yeni IP Ekle
+                        </button>
+                    }
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover data-table" id="ipTable">
+                        <thead>
+                            <tr>
+                                <th>IP No</th>
+                                <th>Açıklama</th>
+                                <th>Oluşturulma Tarihi</th>
+                                <th>Oluşturan</th>
+                                <th style="width: 200px;">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model != null && Model.Any())
+                            {
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.IpNo</td>
+                                        <td>@(item.Description?.Length > 30 ? item.Description.Substring(0, 30) + "..." : item.Description)</td>
+                                        <td>@item.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                                        <td>@item.CreatedBy</td>
+                                        <td>
+                                            <div class="btn-action-group">
+                                                @if (User.IsInRole("Ana Yönetici") || User.HasClaim("Permission", Permissions.Ip.Edit))
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-outline-warning btn-sm btn-edit"
+                                                            title="Düzenle"
+                                                            data-id="@item.Id">
+                                                        <i class="fa fa-edit"></i>
+                                                    </button>
+                                                }
+                                                <button type="button"
+                                                        class="btn btn-outline-info btn-sm"
+                                                        title="Detay"
+                                                        data-toggle="modal"
+                                                        data-target="#detayModal"
+                                                        data-id="@item.Id"
+                                                        data-ipno="@item.IpNo"
+                                                        data-description="@(string.IsNullOrEmpty(item.Description) ? "-" : item.Description)"
+                                                        data-createddate="@item.CreatedDate.ToString("dd.MM.yyyy HH:mm:ss")"
+                                                        data-createdby="@item.CreatedBy"
+                                                        data-updateddate="@(item.UpdatedDate?.ToString("dd.MM.yyyy HH:mm:ss") ?? "-")"
+                                                        data-updatedby="@(item.UpdatedBy ?? "-")">
+                                                    <i class="fa fa-info-circle"></i>
+                                                </button>
+                                                @if (User.IsInRole("Ana Yönetici") || User.HasClaim("Permission", Permissions.Ip.Delete))
+                                                {
+                                                    <button type="button"
+                                                            class="btn btn-outline-danger btn-sm btn-delete"
+                                                            title="Sil"
+                                                            data-id="@item.Id">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center">Kayıtlı IP adresi bulunamadı.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== EKLE MODAL ======================== -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="createModalLabel">
+                    <i class="fa fa-plus-circle mr-2"></i> Yeni IP Ekle
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="createForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div id="createErrors" class="alert alert-danger d-none"></div>
+                    <div class="form-group">
+                        <label for="create_IpNo">IP No <span class="text-danger">*</span></label>
+                        <input type="text" id="create_IpNo" name="IpNo" class="form-control" placeholder="Örn: 192.168.1.0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="create_Description">Açıklama</label>
+                        <textarea id="create_Description" name="Description" class="form-control" rows="3" placeholder="IP hakkında açıklama..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" id="createSubmitBtn">
+                        <i class="fa fa-save mr-1"></i> Kaydet
+                    </button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">
+                        <i class="fa fa-times mr-1"></i> İptal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== DÜZENLE MODAL ======================== -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="editModalLabel">
+                    <i class="fa fa-edit mr-2"></i> IP Düzenle
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="editForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="edit_Id" name="Id" />
+                <div class="modal-body">
+                    <div id="editErrors" class="alert alert-danger d-none"></div>
+                    <div class="d-flex justify-content-center py-3 d-none" id="editLoading">
+                        <div class="spinner-border text-warning" role="status">
+                            <span class="sr-only">Yükleniyor...</span>
+                        </div>
+                    </div>
+                    <div id="editFormFields">
+                        <div class="form-group">
+                            <label for="edit_IpNo">IP No <span class="text-danger">*</span></label>
+                            <input type="text" id="edit_IpNo" name="IpNo" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit_Description">Açıklama</label>
+                            <textarea id="edit_Description" name="Description" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning text-white" id="editSubmitBtn">
+                        <i class="fa fa-save mr-1"></i> Güncelle
+                    </button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">
+                        <i class="fa fa-times mr-1"></i> İptal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== SİL MODAL ======================== -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fa fa-trash mr-2"></i> IP Sil
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="deleteLoading" class="d-flex justify-content-center py-3 d-none">
+                    <div class="spinner-border text-danger" role="status">
+                        <span class="sr-only">Yükleniyor...</span>
+                    </div>
+                </div>
+                <div id="deleteContent">
+                    <p class="mb-3">Aşağıdaki IP adresini silmek istediğinizden emin misiniz?</p>
+                    <table class="table table-bordered mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width:130px;">IP No</th>
+                                <td id="delete_IpNo"></td>
+                            </tr>
+                            <tr>
+                                <th>Açıklama</th>
+                                <td id="delete_Description"></td>
+                            </tr>
+                            <tr>
+                                <th>Oluşturulma</th>
+                                <td id="delete_CreatedDate"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="delete_Id" name="id" />
+                    <button type="submit" class="btn btn-danger mr-2" id="deleteSubmitBtn">
+                        <i class="fa fa-trash mr-1"></i> Evet, Sil
+                    </button>
+                    <button type="button" class="btn btn-light" data-dismiss="modal">
+                        <i class="fa fa-times mr-1"></i> Hayır, İptal
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================== DETAY MODAL ======================== -->
+<div class="modal fade" id="detayModal" tabindex="-1" role="dialog" aria-labelledby="detayModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="detayModalLabel">
+                    <i class="fa fa-info-circle mr-2"></i>
+                    IP Kayıt Detayları — <span id="modal-ipno"></span>
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Kapat">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered mb-0">
+                        <tbody>
+                            <tr>
+                                <th style="width: 200px;">IP No</th>
+                                <td id="modal-val-ipno"></td>
+                            </tr>
+                            <tr>
+                                <th>Açıklama</th>
+                                <td id="modal-val-description"></td>
+                            </tr>
+                            <tr>
+                                <th>Oluşturulma Tarihi</th>
+                                <td id="modal-val-createddate"></td>
+                            </tr>
+                            <tr>
+                                <th>Oluşturan Kullanıcı</th>
+                                <td id="modal-val-createdby"></td>
+                            </tr>
+                            <tr>
+                                <th>Güncellenme Tarihi</th>
+                                <td id="modal-val-updateddate"></td>
+                            </tr>
+                            <tr>
+                                <th>Güncelleyen Kullanıcı</th>
+                                <td id="modal-val-updatedby"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a id="modal-btn-detail" href="#" class="btn btn-outline-primary">
+                    <i class="fa fa-list mr-1"></i> Alt IP'leri Görüntüle
+                </a>
+                <button type="button" class="btn btn-light" data-dismiss="modal">
+                    <i class="fa fa-times mr-1"></i> Kapat
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+$(document).ready(function () {
+
+    var antiForgeryToken = $('input[name="__RequestVerificationToken"]').first().val();
+
+    // Move button to datatables filter if available
+    setTimeout(function() {
+        var filterDiv = $('.dataTables_filter');
+        if (filterDiv.length > 0) {
+            var btn = $('#btnYeniIp').detach();
+            btn.addClass('ml-2');
+            filterDiv.addClass('d-flex align-items-center justify-content-end');
+            filterDiv.find('label').addClass('mb-0 d-flex align-items-center');
+            filterDiv.find('input').addClass('ml-2');
+            filterDiv.append(btn);
+        }
+    }, 100);
+
+    // ===================== YENİ IP EKLE =====================
+    $('#btnYeniIp').on('click', function () {
+        $('#createForm')[0].reset();
+        $('#createErrors').addClass('d-none').empty();
+        $('#createModal').modal('show');
+    });
+
+    $('#createForm').on('submit', function (e) {
+        e.preventDefault();
+        var btn = $('#createSubmitBtn');
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Kaydediliyor...');
+        $('#createErrors').addClass('d-none').empty();
+
+        $.ajax({
+            url: '/Ip/Create',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (res) {
+                if (res.success) {
+                    $('#createModal').modal('hide');
+                    Swal.fire({
+                        title: 'Başarılı!',
+                        text: 'IP adresi başarıyla oluşturuldu.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(function () {
+                        location.reload();
+                    });
+                } else {
+                    $('#createErrors').removeClass('d-none').html(res.errors.join('<br>'));
+                }
+            },
+            error: function () {
+                $('#createErrors').removeClass('d-none').html('Bir hata oluştu, lütfen tekrar deneyin.');
+            },
+            complete: function () {
+                btn.prop('disabled', false).html('<i class="fa fa-save mr-1"></i> Kaydet');
+            }
+        });
+    });
+
+    // ===================== DÜZENLE =====================
+    $(document).on('click', '.btn-edit', function () {
+        var id = $(this).data('id');
+        $('#editErrors').addClass('d-none').empty();
+        $('#editLoading').removeClass('d-none');
+        $('#editFormFields').addClass('d-none');
+        $('#editModal').modal('show');
+
+        $.ajax({
+            url: '/Ip/GetEdit/' + id,
+            type: 'GET',
+            success: function (res) {
+                if (res.success) {
+                    $('#edit_Id').val(res.id);
+                    $('#edit_IpNo').val(res.ipNo);
+                    $('#edit_Description').val(res.description);
+                    $('#editLoading').addClass('d-none');
+                    $('#editFormFields').removeClass('d-none');
+                } else {
+                    $('#editModal').modal('hide');
+                    Swal.fire('Hata!', res.message || 'Kayıt yüklenemedi.', 'error');
+                }
+            },
+            error: function () {
+                $('#editModal').modal('hide');
+                Swal.fire('Hata!', 'Bir hata oluştu.', 'error');
+            }
+        });
+    });
+
+    $('#editForm').on('submit', function (e) {
+        e.preventDefault();
+        var id = $('#edit_Id').val();
+        var btn = $('#editSubmitBtn');
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Güncelleniyor...');
+        $('#editErrors').addClass('d-none').empty();
+
+        $.ajax({
+            url: '/Ip/Edit/' + id,
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function (res) {
+                if (res.success) {
+                    $('#editModal').modal('hide');
+                    Swal.fire({
+                        title: 'Başarılı!',
+                        text: 'IP adresi bilgileri başarıyla güncellendi.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(function () {
+                        location.reload();
+                    });
+                } else {
+                    $('#editErrors').removeClass('d-none').html(res.errors.join('<br>'));
+                }
+            },
+            error: function () {
+                $('#editErrors').removeClass('d-none').html('Bir hata oluştu, lütfen tekrar deneyin.');
+            },
+            complete: function () {
+                btn.prop('disabled', false).html('<i class="fa fa-save mr-1"></i> Güncelle');
+            }
+        });
+    });
+
+    // ===================== SİL =====================
+    $(document).on('click', '.btn-delete', function () {
+        var id = $(this).data('id');
+        $('#deleteContent').addClass('d-none');
+        $('#deleteLoading').removeClass('d-none');
+        $('#deleteModal').modal('show');
+
+        $.ajax({
+            url: '/Ip/GetDelete/' + id,
+            type: 'GET',
+            success: function (res) {
+                if (res.success) {
+                    $('#delete_Id').val(res.recordId);
+                    $('#delete_IpNo').text(res.ipNo);
+                    $('#delete_Description').text(res.description);
+                    $('#delete_CreatedDate').text(res.createdDate);
+                    $('#deleteLoading').addClass('d-none');
+                    $('#deleteContent').removeClass('d-none');
+                } else {
+                    $('#deleteModal').modal('hide');
+                    Swal.fire('Hata!', res.message || 'Kayıt yüklenemedi.', 'error');
+                }
+            },
+            error: function () {
+                $('#deleteModal').modal('hide');
+                Swal.fire('Hata!', 'Bir hata oluştu.', 'error');
+            }
+        });
+    });
+
+    $('#deleteForm').on('submit', function (e) {
+        e.preventDefault();
+        var id = $('#delete_Id').val();
+        var btn = $('#deleteSubmitBtn');
+        btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin mr-1"></i> Siliniyor...');
+
+        $.ajax({
+            url: '/Ip/Delete/' + id,
+            type: 'POST',
+            data: { id: id, __RequestVerificationToken: antiForgeryToken },
+            success: function (res) {
+                if (res.success) {
+                    $('#deleteModal').modal('hide');
+                    Swal.fire({
+                        title: 'Silindi!',
+                        text: 'IP adresi kaydı başarıyla silindi.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(function () {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire('Hata!', res.message || 'Silinemedi.', 'error');
+                    btn.prop('disabled', false).html('<i class="fa fa-trash mr-1"></i> Evet, Sil');
+                }
+            },
+            error: function () {
+                Swal.fire('Hata!', 'Bir hata oluştu.', 'error');
+                btn.prop('disabled', false).html('<i class="fa fa-trash mr-1"></i> Evet, Sil');
+            }
+        });
+    });
+
+    // ===================== DETAY MODAL =====================
+    $('#detayModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var id          = button.data('id');
+        var ipno        = button.data('ipno');
+        var description = button.data('description');
+        var createddate = button.data('createddate');
+        var createdby   = button.data('createdby');
+        var updateddate = button.data('updateddate');
+        var updatedby   = button.data('updatedby');
+
+        var modal = $(this);
+        modal.find('#modal-ipno').text(ipno);
+        modal.find('#modal-val-ipno').text(ipno);
+        modal.find('#modal-val-description').text(description);
+        modal.find('#modal-val-createddate').text(createddate);
+        modal.find('#modal-val-createdby').text(createdby);
+        modal.find('#modal-val-updateddate').text(updateddate);
+        modal.find('#modal-val-updatedby').text(updatedby);
+        modal.find('#modal-btn-detail').attr('href', '/Ip/Details/' + id);
+    });
+
+});
+</script>
+}
+

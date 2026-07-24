@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>@ViewData["Title"] - IpGroups</title>
+  
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/vendors/iconfonts/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/vendors/css/vendor.bundle.base.css">
+  <link rel="stylesheet" href="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/vendors/css/vendor.bundle.addons.css">
+  
+  <!-- inject:css -->
+  <link rel="stylesheet" href="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/css/style.css">
+
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+  
+  <link rel="shortcut icon" href="~/favicon.ico" />
+</head>
+<body>
+  <div class="container-scroller">
+    <div class="container-fluid page-body-wrapper full-page-wrapper">
+      <div class="content-wrapper d-flex align-items-stretch auth px-0" style="min-height:100vh;">
+        @RenderBody()
+      </div>
+      <!-- content-wrapper ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+  </div>
+  <!-- container-scroller -->
+
+  <!-- plugins:js -->
+  <script src="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/vendors/js/vendor.bundle.base.js"></script>
+  <script src="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/vendors/js/vendor.bundle.addons.js"></script>
+  
+  <!-- inject:js -->
+  <script src="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/js/off-canvas.js"></script>
+  <script src="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/js/hoverable-collapse.js"></script>
+  <script src="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/js/misc.js"></script>
+  <script src="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/js/settings.js"></script>
+  <script src="~/Melody-Premium-Bootstrap-Admin-Dashboard-Template/js/todolist.js"></script>
+  <script src="~/js/site.js" asp-append-version="true"></script>
+
+  @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

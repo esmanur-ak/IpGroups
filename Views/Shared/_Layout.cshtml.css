@@ -1,0 +1,13 @@
+/* Melody Template override - ASP.NET Core default styles removed to prevent conflicts */
+
+/* Remove default ASP.NET Core styles that conflict with Melody Template */
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Ensure content wrapper fills available space */
+.content-wrapper {
+  min-height: calc(100vh - 60px - 52px); /* viewport - navbar - footer */
+}

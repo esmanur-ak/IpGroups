@@ -1,0 +1,87 @@
+@using Microsoft.AspNetCore.Identity
+@using IpGroups.Models.Entities
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+
+@using IpGroups.Constants
+
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+      var user = await UserManager.GetUserAsync(User);
+      var displayName = user?.AdSoyad ?? User.Identity?.Name ?? "Kullanıcı";
+      var isFemale = user?.Gender == "Kadın";
+      var avatarUrl = !string.IsNullOrEmpty(user?.ProfilePictureUrl)
+          ? user.ProfilePictureUrl
+          : (isFemale ? "/images/female-avatar.png" : "/images/male-avatar.png");
+
+      <li class="nav-item nav-profile">
+        <div class="nav-link">
+          <div class="profile-image">
+            <img src="@avatarUrl" alt="image"/>
+          </div>
+          <div class="profile-name">
+            <p class="name">
+              @displayName
+            </p>
+            <p class="designation text-muted">
+              @User.Identity?.Name
+            </p>
+          </div>
+        </div>
+      </li>
+    }
+    <li class="nav-item">
+      <a class="nav-link" asp-controller="Home" asp-action="Index">
+        <i class="fa fa-home fa-fw menu-icon"></i>
+        <span class="menu-title">Anasayfa</span>
+      </a>
+    </li>
+    @if (User.IsInRole("Ana Yönetici") || User.HasClaim("Permission", Permissions.Person.View))
+    {
+      <li class="nav-item">
+        <a class="nav-link" asp-controller="Person" asp-action="Index">
+          <i class="fa fa-users fa-fw menu-icon"></i>
+          <span class="menu-title">Personel Yönetimi</span>
+        </a>
+      </li>
+    }
+    @if (User.IsInRole("Ana Yönetici") || User.HasClaim("Permission", Permissions.Bina.View))
+    {
+      <li class="nav-item">
+        <a class="nav-link" asp-controller="Bina" asp-action="Index">
+          <i class="fa fa-building fa-fw menu-icon"></i>
+          <span class="menu-title">Bina Yönetimi</span>
+        </a>
+      </li>
+    }
+    @if (User.IsInRole("Ana Yönetici") || User.HasClaim("Permission", Permissions.Birim.View))
+    {
+      <li class="nav-item">
+        <a class="nav-link" asp-controller="Birim" asp-action="Index">
+          <i class="fa fa-sitemap fa-fw menu-icon"></i>
+          <span class="menu-title">Birim Yönetimi</span>
+        </a>
+      </li>
+    }
+    @if (User.IsInRole("Ana Yönetici") || User.HasClaim("Permission", Permissions.Ip.View))
+    {
+      <li class="nav-item">
+        <a class="nav-link" asp-controller="Ip" asp-action="Index">
+          <i class="fa fa-server fa-fw menu-icon"></i>
+          <span class="menu-title">IP Yönetimi</span>
+        </a>
+      </li>
+    }
+    @if (User.IsInRole("Ana Yönetici"))
+    {
+      <li class="nav-item">
+        <a class="nav-link" asp-controller="Role" asp-action="Index">
+          <i class="fa fa-user-shield fa-fw menu-icon"></i>
+          <span class="menu-title">Kullanıcı Yönetimi</span>
+        </a>
+      </li>
+    }
+  </ul>
+</nav>

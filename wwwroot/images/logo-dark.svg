@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 60" width="220" height="60">
+  <!-- Icon: 3 connected purple nodes forming a right-pointing triangle -->
+  <g fill="none" stroke="#b366ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="18" y1="15" x2="18" y2="45" />
+    <line x1="18" y1="15" x2="48" y2="30" />
+    <line x1="18" y1="45" x2="48" y2="30" />
+  </g>
+  <circle cx="18" cy="15" r="8.5" fill="#b366ff" />
+  <circle cx="18" cy="45" r="8.5" fill="#b366ff" />
+  <circle cx="48" cy="30" r="11" fill="#b366ff" />
+
+  <!-- Text: IpGroups -->
+  <text x="68" y="41" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif" font-size="30" font-weight="800" letter-spacing="-0.3">
+    <tspan fill="#1a1d2e">Ip</tspan><tspan fill="#b366ff">Groups</tspan>
+  </text>
+</svg>

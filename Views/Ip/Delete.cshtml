@@ -1,0 +1,48 @@
+﻿@model IpGroups.Models.ViewModels.IpViewModel
+
+@{
+    ViewData["Title"] = "IP Sil";
+}
+
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title text-danger">Silme Onayı</h4>
+                <p class="card-description">
+                    Bu IP adresini silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.
+                </p>
+                
+                <div class="table-responsive mb-4">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>IP No</th>
+                                <td>@Model.IpNo</td>
+                            </tr>
+                            <tr>
+                                <th>Açıklama</th>
+                                <td>@(string.IsNullOrEmpty(Model.Description) ? "-" : Model.Description)</td>
+                            </tr>
+                            <tr>
+                                <th>Oluşturulma Tarihi</th>
+                                <td>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <form asp-action="Delete" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-danger btn-icon-text mr-2"><i class="fa fa-trash btn-icon-prepend"></i> Evet, Sil</button>
+                    <a asp-action="Index" class="btn btn-light btn-icon-text"><i class="fa fa-times btn-icon-prepend"></i> Hayır, İptal</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

@@ -1,0 +1,100 @@
+﻿@model IpGroups.Models.ViewModels.RegisterViewModel
+
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<div class="row w-100 mx-0">
+    <div class="col-lg-4 col-md-6 col-sm-8 mx-auto">
+        <div class="auth-form-light text-left py-5 px-4 px-sm-5 shadow-lg rounded">
+            <div class="brand-logo text-center mb-4">
+                <img src="~/images/logo.svg" alt="IpGroups Logo" style="height: 48px; width: auto;" />
+            </div>
+            <h4 class="font-weight-bold text-dark text-center mb-1">Yeni Hesap Oluştur</h4>
+            <h6 class="font-weight-light text-muted text-center mb-4">Kayıt olmak için bilgilerinizi girin.</h6>
+
+            <form asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger p-2 small mb-3"></div>
+
+                <div class="form-group">
+                    <label asp-for="AdSoyad" class="font-weight-medium"></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend bg-transparent">
+                            <span class="input-group-text bg-transparent border-right-0">
+                                <i class="fa fa-user text-primary"></i>
+                            </span>
+                        </div>
+                        <input asp-for="AdSoyad" class="form-control form-control-lg border-left-0" placeholder="Ad Soyad" />
+                    </div>
+                    <span asp-validation-for="AdSoyad" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email" class="font-weight-medium"></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend bg-transparent">
+                            <span class="input-group-text bg-transparent border-right-0">
+                                <i class="fa fa-envelope text-primary"></i>
+                            </span>
+                        </div>
+                        <input asp-for="Email" class="form-control form-control-lg border-left-0" placeholder="ornek@ipgroups.com" autocomplete="username" />
+                    </div>
+                    <span asp-validation-for="Email" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Gender" class="font-weight-medium"></label>
+                    <div class="d-flex align-items-center mt-2">
+                        <div class="custom-control custom-radio mr-4">
+                            <input type="radio" id="regGenderMale" asp-for="Gender" class="custom-control-input" value="Erkek">
+                            <label class="custom-control-label font-weight-normal" for="regGenderMale">Erkek</label>
+                        </div>
+                        <div class="custom-control custom-radio">
+                            <input type="radio" id="regGenderFemale" asp-for="Gender" class="custom-control-input" value="Kadın">
+                            <label class="custom-control-label font-weight-normal" for="regGenderFemale">Kadın</label>
+                        </div>
+                    </div>
+                    <span asp-validation-for="Gender" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password" class="font-weight-medium"></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend bg-transparent">
+                            <span class="input-group-text bg-transparent border-right-0">
+                                <i class="fa fa-lock text-primary"></i>
+                            </span>
+                        </div>
+                        <input asp-for="Password" class="form-control form-control-lg border-left-0" placeholder="••••••••" autocomplete="new-password" />
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger small"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword" class="font-weight-medium"></label>
+                    <div class="input-group">
+                        <div class="input-group-prepend bg-transparent">
+                            <span class="input-group-text bg-transparent border-right-0">
+                                <i class="fa fa-check-circle text-primary"></i>
+                            </span>
+                        </div>
+                        <input asp-for="ConfirmPassword" class="form-control form-control-lg border-left-0" placeholder="••••••••" autocomplete="new-password" />
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn">
+                        <i class="fas fa-user-plus mr-2"></i> KAYIT OL
+                    </button>
+                </div>
+
+                <div class="text-center mt-4 font-weight-light">
+                    Zaten bir hesabınız var mı? <a asp-action="Login" class="text-primary font-weight-bold">Giriş Yap</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

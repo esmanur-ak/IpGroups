@@ -98,7 +98,7 @@
     </div>
 </div>
 
-<!-- ======================== EKLE MODAL ======================== -->
+
 <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -172,7 +172,7 @@
     </div>
 </div>
 
-<!-- ======================== DÜZENLE MODAL ======================== -->
+
 <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -254,7 +254,7 @@
     </div>
 </div>
 
-<!-- ======================== SİL MODAL ======================== -->
+
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -308,7 +308,7 @@
     </div>
 </div>
 
-<!-- ======================== DETAY MODAL ======================== -->
+
 <div class="modal fade" id="detayModal" tabindex="-1" role="dialog" aria-labelledby="detayModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -379,7 +379,7 @@
         $(document).ready(function () {
             var antiForgeryToken = $('input[name="__RequestVerificationToken"]').first().val();
 
-            // ===================== SELECT2 =====================
+            
             function initSelect2(modalId) {
                 $('#' + modalId + ' .select2-ip').select2({
                     dropdownParent: $('#' + modalId),
@@ -414,7 +414,7 @@
                 }
             }, 100);
 
-            // ===================== YENİ EKLE =====================
+            
             $('#btnYeniEkle').on('click', function (e) {
                 e.preventDefault();
                 $('#createForm')[0].reset();
@@ -457,7 +457,7 @@
                 });
             });
 
-            // ===================== DÜZENLE =====================
+            
             $(document).on('click', '.btn-edit', function () {
                 var id = $(this).data('id');
                 $('#editErrors').addClass('d-none').empty();
@@ -540,7 +540,7 @@
                 });
             });
 
-            // ===================== SİL =====================
+            
             $(document).on('click', '.btn-delete', function () {
                 var id = $(this).data('id');
                 $('#deleteContent').addClass('d-none');
@@ -604,7 +604,7 @@
                 });
             });
 
-            // ===================== DETAY MODAL =====================
+           
             $('#detayModal').on('show.bs.modal', function (event) {
                 var button = $(event.relatedTarget);
                 var adsoyad     = button.data('adsoyad');

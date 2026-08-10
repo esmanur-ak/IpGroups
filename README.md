@@ -175,8 +175,6 @@ cd IpGroups
 }
 ```
 
-> Gerçek veritabanı şifrenizi GitHub üzerinde paylaşmayın.
-
 ### Migration
 
 Gerekli migration işlemlerinden sonra uygulama çalıştırılabilir.
@@ -213,8 +211,6 @@ Bu proje **iki kişilik bir ekip çalışması** olarak geliştirilmiştir.
 * **Halime Bulut** - [GitHub](https://github.com/Halime-blt)
 
 Projenin geliştirme sürecinde analiz, tasarım, backend geliştirme, veritabanı işlemleri ve test aşamalarında birlikte çalışılmıştır.
-
-> Proje bir ekip çalışması olarak geliştirilmiş olup, repository'nin Esmanur Ak hesabında bulunması projenin yalnızca tek kişi tarafından geliştirildiği anlamına gelmemektedir.
 
 ## 📌 Geliştirme Notu
 

@@ -7,7 +7,7 @@ Proje, kullanıcıların yetkilerine göre farklı işlemler gerçekleştirebild
  <img width="1917" height="912" alt="login" src="https://github.com/user-attachments/assets/cba778e5-4bfa-4568-b998-4c61178bbd93" />
 
 
-## 🚀 Projenin Amacı
+##  Projenin Amacı
 
 Bu projenin temel amacı, kurum içerisinde kullanılan IP adreslerinin ve bunlarla ilişkili bilgilerin düzenli ve merkezi bir şekilde yönetilmesini sağlamaktır.
 
@@ -21,14 +21,14 @@ Uygulama sayesinde:
 * Kullanıcıların erişebileceği işlemler izinler üzerinden kontrol edilebilir.
 * Veriler ilişkisel bir veritabanında güvenli şekilde saklanabilir.
 
-## 📊 Kontrol Paneli
+##  Kontrol Paneli
 
 Anasayfada toplam personel, bina, birim, IP grubu sayıları ile IP atama oranları canlı olarak görüntülenir. IP gruplarının doluluk oranları ve atama durumları grafiklerle özetlenir.
 
  <img width="1892" height="905" alt="dashboard" src="https://github.com/user-attachments/assets/57a8ee10-0df6-4af7-86f2-db6dc4c48a5e" />
 
 
-## ✨ Özellikler
+##  Özellikler
 
 ### IP Grup Yönetimi
 
@@ -73,7 +73,7 @@ gibi işlemler için farklı yetkilendirme kontrolleri uygulanmaktadır. Her kul
 <img width="1902" height="910" alt="kullanici-izinleri" src="https://github.com/user-attachments/assets/17396830-6892-41c5-9ad8-013febd93d6b" />
 
 
-## 🛠️ Kullanılan Teknolojiler
+## Kullanılan Teknolojiler
 
 | Teknoloji               | Kullanım Alanı              |
 | ----------------------- | --------------------------- |
@@ -88,7 +88,7 @@ gibi işlemler için farklı yetkilendirme kontrolleri uygulanmaktadır. Her kul
 
 Projenin `.csproj` dosyasında ASP.NET Core Web SDK, Entity Framework Core Tools, PostgreSQL için Npgsql Entity Framework Core provider ve ASP.NET Core Identity Entity Framework Core paketleri kullanılmaktadır.
 
-## 🏗️ Proje Mimarisi
+##  Proje Mimarisi
 
 Proje, sorumlulukların farklı katmanlara ayrıldığı bir yapı kullanmaktadır.
 
@@ -129,7 +129,7 @@ Servis katmanı ise `Abstract` ve `Concrete` olarak ayrılarak uygulama içerisi
 
 Model yapısında entity ve ViewModel sınıfları ayrı tutulmuştur.
 
-## 🔐 Güvenlik ve Yetkilendirme
+##  Güvenlik ve Yetkilendirme
 
 Uygulamada kullanıcıların gerçekleştirebileceği işlemler **policy-based authorization** yaklaşımıyla kontrol edilmektedir.
 
@@ -137,13 +137,13 @@ Uygulamada kullanıcıların gerçekleştirebileceği işlemler **policy-based a
 
 Ayrıca form işlemlerinde **Anti-Forgery Token** kullanılarak CSRF saldırılarına karşı koruma uygulanmıştır.
 
-## 🗄️ Veritabanı
+##  Veritabanı
 
 Proje veritabanı işlemleri için **PostgreSQL** ve **Entity Framework Core** kullanmaktadır.
 
 Entity Framework Core migrations yapısı sayesinde veritabanı şemasındaki değişikliklerin kontrollü bir şekilde yönetilmesi amaçlanmıştır.
 
-## ⚙️ Kurulum
+##  Kurulum
 
 ### Gereksinimler
 
@@ -185,7 +185,7 @@ dotnet ef database update
 dotnet run
 ```
 
-## 📚 Öğrenilen Konular
+##  Öğrenilen Konular
 
 Bu proje geliştirilirken aşağıdaki konularda pratik kazanılmıştır:
 
@@ -203,7 +203,7 @@ Bu proje geliştirilirken aşağıdaki konularda pratik kazanılmıştır:
 * AJAX tabanlı işlemler
 * Katmanlı ve sürdürülebilir proje yapısı
 
-## 👥 Proje Ekibi
+##  Proje Ekibi
 
 Bu proje **iki kişilik bir ekip çalışması** olarak geliştirilmiştir.
 
@@ -212,12 +212,12 @@ Bu proje **iki kişilik bir ekip çalışması** olarak geliştirilmiştir.
 
 Projenin geliştirme sürecinde analiz, tasarım, backend geliştirme, veritabanı işlemleri ve test aşamalarında birlikte çalışılmıştır.
 
-## 📌 Geliştirme Notu
+##  Geliştirme Notu
 
 Bu proje, gerçek bir kurum içerisindeki IP ve kurumsal bilgi yönetimi süreçlerinin dijitalleştirilmesine yönelik bir çalışma olarak geliştirilmiştir.
 
 Proje geliştikçe yeni özelliklerin eklenmesi ve mevcut yapıların iyileştirilmesi planlanmaktadır.
 
-## 📄 Lisans
+##  Lisans
 
 Bu proje eğitim ve geliştirme amacıyla oluşturulmuştur.
